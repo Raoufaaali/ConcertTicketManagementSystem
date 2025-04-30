@@ -1,3 +1,6 @@
+using Concert_Ticket_Management_System.DataAccessLayer.Repos.EventRepository;
+using Concert_Ticket_Management_System.Services.ConcertServices;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +9,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Dependency Injection for my services
+builder.Services.AddSingleton<IConcertService, ConcertService>();
+builder.Services.AddSingleton<IConcertRepository, ConcertRepository>();
+
 
 var app = builder.Build();
 
