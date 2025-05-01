@@ -1,6 +1,14 @@
 @Concert_Ticket_Management_System_HostAddress = http://localhost:5261
 
-GET {{Concert_Ticket_Management_System_HostAddress}}/weatherforecast/
-Accept: application/json
+
+
+POST {{Concert_Ticket_Management_System_HostAddress}}/api/concerts
+Content-Type: application/json
+
+{
+  "startDate": "2027-07-07T10:00:00+04:00",
+  "name": "2027-07-07T10:00:00+04:00",
+  "description": "2027-07-07T10:00:00+04:00"
+}
 
 ###
