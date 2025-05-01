@@ -24,13 +24,8 @@ public sealed class ConcertService : IConcertService
 
     public async Task<Concert>? AddConcertAsync(ConcertDTO concert, CancellationToken cancellationToken)
     {
-        var entity = new Concert
-        {
-            Name = concert.Name,
-            Description = concert.Description,
-            ConcertDate = concert.ConcertDate
-        };
-        return await _concertRepository.AddEventAsync(entity, cancellationToken);
+        var enitity = _mapper.Map<Concert>(concert);
+        return await _concertRepository.AddEventAsync(enitity, cancellationToken);
     }
 
     public async Task DeleteConcertAsync(int concertId, CancellationToken cancellationToken)
@@ -51,6 +46,47 @@ public sealed class ConcertService : IConcertService
             _logger.LogWarning("Concert with ID {Id} not found.", concertId);
         }
         return concert;
+    }
+
+    public async Task<Result<int>> UpdateAvailableCapacityAsync(int concertId, ManageCapacityRequest request, CancellationToken cancellationToken)
+    {
+        /*
+         * Validate the concert exists
+         * Validate business rules
+         * return errors if any
+         * call db to update the available capacity
+         */
+
+        // Check if the concert exists in the dictionary
+        var existingConcert = await _concertRepository.GetEventByIdAsync(concertId, cancellationToken).ConfigureAwait(false);
+        if (existingConcert == null)
+        {
+            return Result<int>.Failure(new[] { "Concert not found." });
+        }
+
+        var rejectionReasons = ValidateAvailableCapacityRules(existingConcert, request.NewCapacity);
+
+        if (rejectionReasons.Any())
+        {
+            return Result<int>.Failure(rejectionReasons);
+        }
+
+        // Update the available capacity
+        await _concertRepository.UpdateAvailableCapacityAsync(concertId, request.NewCapacity, cancellationToken).ConfigureAwait(false);
+        return Result<int>.Success(0);
+    }
+
+    private IEnumerable<string> ValidateAvailableCapacityRules(Concert existingConcert, int newAvailableCapacity)
+    {
+        if (newAvailableCapacity <= 0)
+        {
+            yield return "Available capacity must be greater than zero.";
+        }
+        if (newAvailableCapacity > existingConcert.TotalCapacity)
+        {
+            yield return "Available capacity cannot exceed total capacity.";
+        }
+        yield break;
     }
 
     public async Task<Result<Concert>> UpdateConcertAsync(int concertId, ConcertDTO concertDto, CancellationToken cancellationToken)

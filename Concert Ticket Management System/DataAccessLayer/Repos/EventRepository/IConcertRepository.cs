@@ -38,4 +38,14 @@ public interface IConcertRepository
     /// <param name="id"></param>
     /// <returns></returns>
     Task DeleteEventAsync(int id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Updates the available capacity of a concert event.
+    /// </summary>
+    /// <param name="concertId"></param>
+    /// <param name="newAvailableCapacity"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task UpdateAvailableCapacityAsync(int concertId, int newAvailableCapacity, CancellationToken cancellationToken);
+
 }

@@ -78,4 +78,17 @@ public class ConcertsController : Controller
         return BadRequest(new ApiResponse<string>(false, result.Errors));
     }
 
+    [HttpPut("{concertId}/manage-capacity")]
+    public async Task<IActionResult> ManageCapacity(int concertId, [FromBody] ManageCapacityRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _concertService.UpdateAvailableCapacityAsync(concertId, request, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new ApiResponse<string>(false, result.Errors));
+        }
+
+        return Ok(new ApiResponse<int>(true, new List<string> { "Capacity updated successfully." }, result.Data));
+
+    }
+
 }
