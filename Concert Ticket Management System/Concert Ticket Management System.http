@@ -12,3 +12,8 @@ Content-Type: application/json
 }
 
 ###
+
+GET {{Concert_Ticket_Management_System_HostAddress}}/api/concerts
+Content-Type: application/json
+
+###
