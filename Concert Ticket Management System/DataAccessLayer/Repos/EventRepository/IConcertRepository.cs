@@ -30,7 +30,7 @@ public interface IConcertRepository
     /// </summary>
     /// <param name="concert"></param>
     /// <returns></returns>
-    Task UpdateEventAsync(Concert concert, CancellationToken cancellationToken);
+    Task<Concert>? UpdateEventAsync(Concert concert, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes a concert event by its id.

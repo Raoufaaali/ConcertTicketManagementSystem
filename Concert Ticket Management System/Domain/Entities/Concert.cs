@@ -8,7 +8,7 @@ public sealed class Concert
     public int Id { get; set; }
 
     // Preferred to use DateTimeOffset for time zone handling
-    public DateTimeOffset StartDate { get; set; } 
+    public DateTimeOffset ConcertDate { get; set; } 
 
     public string Name { get; set; } = string.Empty;
 

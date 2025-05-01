@@ -40,9 +40,20 @@ public class ConcertRepository : IConcertRepository
         return null; // Return null if the concert could not be added
     }
 
-    public Task DeleteEventAsync(int eventId, CancellationToken cancellationToken)
+    public Task DeleteEventAsync(int concertId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // This method doesn't differntiate between a successful and unsuccessful deletion. It can but it doesnt
+        var isDeleted = _db.TryRemove(concertId, out var concert);
+        if (isDeleted)
+        {
+            _logger.LogInformation($"Concert with ID {concertId} deleted from the database.");
+        }
+        else
+        {
+            // This is where we would maybe return a different status code. 
+            _logger.LogWarning($"Concert with ID {concertId} not found in the database.");
+        }
+        return Task.CompletedTask;
     }
 
     public Task<IEnumerable<Concert>> GetAllEventsAsync(CancellationToken cancellationToken)
@@ -59,11 +70,24 @@ public class ConcertRepository : IConcertRepository
         {
             return Task.FromResult(concert);
         }
-        return null;
+        return Task.FromResult<Concert>(null);
     }
 
-    public Task UpdateEventAsync(Concert concert, CancellationToken cancellationToken)
+    public Task<Concert>? UpdateEventAsync(Concert concert, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // Check if the concert exists in the dictionary
+        if (_db.ContainsKey(concert.Id))
+        {
+            // Update the concert in the dictionary
+            _db[concert.Id] = concert;
+            _logger.LogInformation($"Concert with ID {concert.Id} updated in the database.");
+            return Task.FromResult<Concert?>(concert);
+        }
+        else
+        {
+            // Handle the case where the concert does not exist
+            _logger.LogWarning($"Concert with ID {concert.Id} not found in the database.");
+        }
+        return Task.FromResult<Concert?>(null); // Return null if the concert could not be updated
     }
 }
