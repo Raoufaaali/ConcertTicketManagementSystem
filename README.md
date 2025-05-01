@@ -19,3 +19,16 @@ Core features:
 place which you can leverage)
 - Cancel reservations
 - View ticket availability
+
+
+## Design Decisions
+This task is fairly open-ended. As such, I have made some decisions in the implementation as summerized below:
+
+- I decided to use a dictionary as an in-memory database. Pros: include simplicity and fit for purpose. Cons: well, it's not a database.
+- I used application level services to separate the controllers from the database.
+- Although the operations are actually synchronous in nature (due to the db being an in-memory dictionary), I have opted to use Async method accross the board with CancellationToken to demonstrate its use in an actual distributed system. 
+- I used dependecy injection where needed.
+- I have used ApiResponse<T> class. This serve as a standard way the API wrap responses (where applicable)
+- I have used DTO where applicable and hidden the business model.
+- I used AutoMapper for, well, mapping betwwen a ConcertDTO and a Concert
+
