@@ -11,4 +11,5 @@ public interface IConcertService
     public Task<Concert>? AddConcertAsync(ConcertDTO concert, CancellationToken cancellationToken);
     public Task<Result<Concert>> UpdateConcertAsync(int concertId, ConcertDTO concert, CancellationToken cancellationToken);
     public Task? DeleteConcertAsync(int concertId, CancellationToken cancellationToken);
+    public Task<Result<int>> UpdateAvailableCapacityAsync(int concertId, ManageCapacityRequest request, CancellationToken cancellationToken);
 }

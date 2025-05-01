@@ -1,4 +1,6 @@
-﻿namespace Concert_Ticket_Management_System.DTOs;
+﻿using Concert_Ticket_Management_System.Domain.Entities;
+
+namespace Concert_Ticket_Management_System.DTOs;
 
 /// <summary>
 /// Data Transfer Object for Concert.
@@ -11,4 +13,9 @@ public sealed class ConcertDTO
     public string Name { get; set; } = string.Empty;
 
     public string? Description { get; set; } = string.Empty;
+
+    public int TotalCapacity { get; set; }
+
+    public Dictionary<TicketType, decimal> TicketPricing { get; set; } = []; // e.g., {"TicketType.VIP": 100.0, "TicketType.General": 50.0}
+
 }

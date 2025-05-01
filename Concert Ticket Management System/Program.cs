@@ -14,6 +14,9 @@ builder.Services.AddSwaggerGen();
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// Model validation
+builder.Services.AddControllers().AddDataAnnotationsLocalization();
+
 // Dependency Injection for my services
 builder.Services.AddSingleton<IConcertService, ConcertService>();
 builder.Services.AddSingleton<IConcertRepository, ConcertRepository>();

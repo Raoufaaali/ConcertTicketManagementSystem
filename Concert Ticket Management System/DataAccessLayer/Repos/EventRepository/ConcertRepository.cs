@@ -20,6 +20,12 @@ public class ConcertRepository : IConcertRepository
         // This is not an actual async method, but for the sake of the example, we will keep it as such.
         // In a real-world scenario, you would use async methods to interact with a database.
 
+        if (concert is null)
+        {
+            _logger.LogError("Concert object is null.");
+            return null;
+        }
+
         // Generate a unique key in a thread-safe manner
         int newId = Interlocked.Increment(ref _currentId);
 
@@ -71,6 +77,24 @@ public class ConcertRepository : IConcertRepository
             return Task.FromResult(concert);
         }
         return Task.FromResult<Concert>(null);
+    }
+
+    public Task UpdateAvailableCapacityAsync(int concertId, int newAvailableCapacity, CancellationToken cancellationToken)
+    {
+        // Check if the concert exists in the dictionary
+        if (_db.TryGetValue(concertId, out var concert))
+        {
+            // Update the available capacity
+            concert.AvailableCapacity = newAvailableCapacity;
+            _logger.LogInformation($"Concert with ID {concertId} updated with new available capacity: {newAvailableCapacity}.");
+            return Task.CompletedTask;
+        }
+        else
+        {
+            // Handle the case where the concert does not exist
+            _logger.LogWarning($"Concert with ID {concertId} not found in the database.");
+        }
+        return Task.CompletedTask;
     }
 
     public Task<Concert>? UpdateEventAsync(Concert concert, CancellationToken cancellationToken)

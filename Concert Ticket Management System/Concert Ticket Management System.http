@@ -6,11 +6,17 @@ POST {{Concert_Ticket_Management_System_HostAddress}}/api/concerts
 Content-Type: application/json
 
 {
-  "concertDate": "2027-07-07T10:00:00+04:00",
-  "name": "2027-07-07T10:00:00+04:00",
-  "description": "2027-07-07T10:00:00+04:00"
+  "concertDate": "2025-06-15T19:00:00Z",
+  "name": "EDC 2025",
+  "description": "Let's rave.",
+  "totalCapacity": 100,
+  "ticketPricing": {
+    "VIP": 150.0,
+    "General": 50.0,
+    "EarlyBird": 40.0,
+    "Student": 30.0
+  }
 }
-
 ###
 
 GET {{Concert_Ticket_Management_System_HostAddress}}/api/concerts
