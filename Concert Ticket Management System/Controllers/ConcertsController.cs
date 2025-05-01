@@ -20,7 +20,7 @@ public class ConcertsController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddConcertAsync(ConcertDTO concertDTO, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddConcertAsync([FromBody] ConcertDTO concertDTO, CancellationToken cancellationToken)
     {
         var result = await _concertService.AddConcertAsync(concertDTO, cancellationToken);
         if (result == null)
@@ -28,8 +28,8 @@ public class ConcertsController : Controller
             throw new InvalidOperationException ("Failed to add the concert.");
         }
 
-        _logger.LogInformation("Concert added successfully. Name: {Name}, StartDate: {StartDate}, Description: {Description}",
-            concertDTO.Name, concertDTO.StartDate, concertDTO.Description);
+        _logger.LogInformation("Concert added successfully. Name: {Name}, ConcertDate: {ConcertDate}, Description: {Description}",
+            concertDTO.Name, concertDTO.ConcertDate, concertDTO.Description);
 
         return Ok(result);
     }

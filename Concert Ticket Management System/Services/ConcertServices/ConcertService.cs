@@ -23,7 +23,7 @@ public sealed class ConcertService : IConcertService
         {
             Name = concert.Name,
             Description = concert.Description,
-            StartDate = concert.StartDate
+            StartDate = concert.ConcertDate
         };
         return await _concertRepository.AddEventAsync(entity, cancellationToken);
     }
