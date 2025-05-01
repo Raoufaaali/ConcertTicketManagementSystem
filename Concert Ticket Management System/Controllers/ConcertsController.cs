@@ -26,13 +26,13 @@ public class ConcertsController : Controller
         var result = await _concertService.AddConcertAsync(concertDTO, cancellationToken);
         if (result == null)
         {
-            return BadRequest(new ApiResponse<string>(false, "Failed to add the concert."));
+            return BadRequest(new ApiResponse<string>(false, new List<string> { "Failed to add the concert." }));
         }
 
         _logger.LogInformation("Concert added successfully. Name: {Name}, ConcertDate: {ConcertDate}, Description: {Description}",
             concertDTO.Name, concertDTO.ConcertDate, concertDTO.Description);
 
-        return Ok(new ApiResponse<Concert>(true, "Concert added successfully.", result));
+        return Ok(new ApiResponse<Concert>(true, new List<string> { "Concert added successfully." }, result));
     }
 
     [HttpGet]
@@ -42,9 +42,40 @@ public class ConcertsController : Controller
         if (concerts.Any())
         {
             _logger.LogInformation("Retrieved {Count} concerts.", concerts.Count());
-            return Ok(new ApiResponse<IEnumerable<Concert>>(true,string.Empty, concerts ));
+            return Ok(new ApiResponse<IEnumerable<Concert>>(true, null, concerts));
         }
 
-        return NotFound(new ApiResponse<string>(false, "No concerts found."));
+        return NotFound(new ApiResponse<string>(false, new List<string> { "No concerts found." }));
     }
+
+    [HttpGet("{concertId:int}")]
+    public async Task<IActionResult> GetConcertByIdAsync(int concertId, CancellationToken cancellationToken)
+    {
+        var concert = await _concertService.GetConcertByIdAsync(concertId, cancellationToken);
+        if (concert != null)
+        {
+            return Ok(new ApiResponse<Concert>(true, null, concert));
+        }
+        return NotFound(new ApiResponse<string>(false, new List<string> { "Concert not found." }));
+    }
+
+    [HttpDelete("{concertId:int}")]
+    public async Task<IActionResult> DeleteConcertAsync(int concertId, CancellationToken cancellationToken)
+    {
+        await _concertService.DeleteConcertAsync(concertId, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPut("{concertId:int}")]
+    public async Task<IActionResult> UpdateConcertAsync(int concertId, [FromBody] ConcertDTO concertDTO, CancellationToken cancellationToken)
+    {
+        var result = await _concertService.UpdateConcertAsync(concertId, concertDTO, cancellationToken);
+        if (result.IsSuccess)
+        {
+            return Ok(new ApiResponse<Concert>(true, new List<string> { "Concert updated successfully." }, result.Data));
+        }
+
+        return BadRequest(new ApiResponse<string>(false, result.Errors));
+    }
+
 }

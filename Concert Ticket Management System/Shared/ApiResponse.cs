@@ -3,13 +3,13 @@
 public sealed class ApiResponse<T>
 {
     public bool Success { get; set; }
-    public string Message { get; set; }
+    public IEnumerable<string>? Messages { get; set; }
     public T? Data { get; set; }
 
-    public ApiResponse(bool success, string message, T? data = default)
+    public ApiResponse(bool success, IEnumerable<string>? messages, T? data = default)
     {
         Success = success;
-        Message = message;
+        Messages = messages;
         Data = data;
     }
 }
