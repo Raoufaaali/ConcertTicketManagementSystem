@@ -19,4 +19,6 @@ public interface IConcertService
     public Task<Result<int>> UpdateAvailableCapacityAsync(int concertId, ManageCapacityRequest request, CancellationToken cancellationToken);
     
     Task<Result<Reservation>> ReserveTicketsAsync(ReservationRequest request, CancellationToken cancellationToken);
+
+    Task<Reservation>? GetReservationByIdAsync(int reservationId, int concertId, CancellationToken cancellationToken);
 }

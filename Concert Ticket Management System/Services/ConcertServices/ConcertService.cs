@@ -182,6 +182,12 @@ public sealed class ConcertService : IConcertService
         }
     }
 
+    public async Task<Reservation?> GetReservationByIdAsync(int reservationId, int concertId,  CancellationToken cancellationToken)
+    {
+        var reservation = await _reservationRepository.GetReservationAsync(reservationId, concertId, cancellationToken).ConfigureAwait(false);
+        return reservation;
+    }
+
     private DateTimeOffset CalculateExpiraryDate(int seconds)
     {
         return DateTimeOffset.UtcNow.AddSeconds(seconds);
