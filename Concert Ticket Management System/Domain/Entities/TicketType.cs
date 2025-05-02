@@ -1,6 +1,6 @@
 ﻿namespace Concert_Ticket_Management_System.Domain.Entities;
 
-public enum TicketType
+public enum TicketType : byte
 {
     /// <summary>
     /// Unknown ticket type.

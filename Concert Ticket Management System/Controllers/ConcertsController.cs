@@ -2,6 +2,7 @@
 using Concert_Ticket_Management_System.DTOs;
 using Concert_Ticket_Management_System.Services.ConcertServices;
 using Concert_Ticket_Management_System.Shared;
+using Concert_Ticket_Management_System.Shared.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Concert_Ticket_Management_System.Controllers;
@@ -23,7 +24,21 @@ public class ConcertsController : Controller
     [HttpPost]
     public async Task<IActionResult> AddConcertAsync([FromBody] ConcertDTO concertDTO, CancellationToken cancellationToken)
     {
-        var result = await _concertService.AddConcertAsync(concertDTO, cancellationToken);
+        if (concertDTO == null)
+        {
+            return BadRequest(new ApiResponse<string>(false, new List<string> { "Concert object cannot be null." }));
+        }
+
+        var validator = new ConcertDTOValidator();
+        var validationResult = validator.Validate(concertDTO);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            return BadRequest(new ApiResponse<string>(false, errors));
+        }
+
+        var result = await _concertService.AddConcertAsync(concertDTO, cancellationToken).ConfigureAwait(false);
         if (result == null)
         {
             return BadRequest(new ApiResponse<string>(false, new List<string> { "Failed to add the concert." }));
@@ -38,7 +53,7 @@ public class ConcertsController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        var concerts = await _concertService.GetAllConcertsAsync(cancellationToken);
+        var concerts = await _concertService.GetAllConcertsAsync(cancellationToken).ConfigureAwait(false);
         if (concerts.Any())
         {
             _logger.LogInformation("Retrieved {Count} concerts.", concerts.Count());
@@ -51,7 +66,7 @@ public class ConcertsController : Controller
     [HttpGet("{concertId:int}")]
     public async Task<IActionResult> GetConcertByIdAsync(int concertId, CancellationToken cancellationToken)
     {
-        var concert = await _concertService.GetConcertByIdAsync(concertId, cancellationToken);
+        var concert = await _concertService.GetConcertByIdAsync(concertId, cancellationToken).ConfigureAwait(false);
         if (concert != null)
         {
             return Ok(new ApiResponse<Concert>(true, null, concert));
@@ -62,14 +77,14 @@ public class ConcertsController : Controller
     [HttpDelete("{concertId:int}")]
     public async Task<IActionResult> DeleteConcertAsync(int concertId, CancellationToken cancellationToken)
     {
-        await _concertService.DeleteConcertAsync(concertId, cancellationToken);
+        await _concertService.DeleteConcertAsync(concertId, cancellationToken).ConfigureAwait(false);
         return NoContent();
     }
 
     [HttpPut("{concertId:int}")]
     public async Task<IActionResult> UpdateConcertAsync(int concertId, [FromBody] ConcertDTO concertDTO, CancellationToken cancellationToken)
     {
-        var result = await _concertService.UpdateConcertAsync(concertId, concertDTO, cancellationToken);
+        var result = await _concertService.UpdateConcertAsync(concertId, concertDTO, cancellationToken).ConfigureAwait(false);
         if (result.IsSuccess)
         {
             return Ok(new ApiResponse<Concert>(true, new List<string> { "Concert updated successfully." }, result.Data));
@@ -81,7 +96,7 @@ public class ConcertsController : Controller
     [HttpPut("{concertId}/manage-capacity")]
     public async Task<IActionResult> ManageCapacity(int concertId, [FromBody] ManageCapacityRequest request, CancellationToken cancellationToken)
     {
-        var result = await _concertService.UpdateAvailableCapacityAsync(concertId, request, cancellationToken);
+        var result = await _concertService.UpdateAvailableCapacityAsync(concertId, request, cancellationToken).ConfigureAwait(false);
         if (!result.IsSuccess)
         {
             return BadRequest(new ApiResponse<string>(false, result.Errors));
@@ -89,6 +104,47 @@ public class ConcertsController : Controller
 
         return Ok(new ApiResponse<int>(true, new List<string> { "Capacity updated successfully." }, result.Data));
 
+    }
+
+    [HttpPost("{concertId}/reserve-tickets")]
+    public async Task<IActionResult> ReserveTicketsAsync(int concertId, [FromBody] ReservationRequest request, CancellationToken cancellationToken)
+    {
+        // There's a lot of validation here and it's cluttering the controller. TODO move these validations to a middleware
+        var concertValidator = new ConcertIdValidator();
+        var concertIdValidationResult = concertValidator.Validate(concertId);
+
+        if (!concertIdValidationResult.IsValid)
+        {
+            return BadRequest(new ApiResponse<string>(false, concertIdValidationResult.Errors.Select(e => e.ErrorMessage).ToList()));
+        }
+
+        var reservationValidator = new ReservationRequestValidator();
+        var reservationValidationResult = reservationValidator.Validate(request);
+
+        if (!reservationValidationResult.IsValid)
+        {
+            return BadRequest(new ApiResponse<string>(false, reservationValidationResult.Errors.Select(e => e.ErrorMessage).ToList()));
+        }
+
+        if (request == null)
+        {
+            return BadRequest(new ApiResponse<string>(false, new List<string> { "Request cannot be null." }));
+        }
+
+        // Ensure the concertId in the path matches the one in the request body
+        if (concertId != request.ConcertId)
+        {
+            return BadRequest(new ApiResponse<string>(false, new List<string> { "Concert ID in the path does not match the request body." }));
+        }
+
+        var result = await _concertService.ReserveTicketsAsync(request, cancellationToken).ConfigureAwait(false);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new ApiResponse<string>(false, result.Errors));
+        }
+
+        return Ok(new ApiResponse<Reservation>(true, new List<string> { "Ticket(s) reserved successfully." }, result.Data));
     }
 
 }
