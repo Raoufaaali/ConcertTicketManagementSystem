@@ -62,11 +62,6 @@ public class ReservationRepository : IReservationRepository
         return Task.FromResult(Result<Reservation>.Success(newReservation));
     }
 
-    public async Task<Result<Reservation>> ConfirmReservationAsync(int reservationId, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException("This method is not implemented yet.");
-    }
-
     public Task<Reservation>? UpdateReservationAsync(Reservation reservation, CancellationToken cancellationToken)
     {
         if (_db.TryGetValue(reservation.ConcertId, out var reservations))
@@ -180,6 +175,26 @@ public class ReservationRepository : IReservationRepository
         }
 
         _logger.LogWarning("Reservation with ID {ReservationId} not found for concert ID {ConcertId}.", reservationId, concertId);
+        return Task.FromResult<bool>(false);
+    }
+
+    public Task<bool> ConfirmReservationAsync(Reservation reservation, int concertId, CancellationToken cancellationToken)
+    {
+        // Clean up expired reservations for the given concert
+        DequeueExpiredItems(concertId);
+
+        if (_db.TryGetValue(concertId, out var reservations))
+        {
+            if (reservations.TryGetValue(reservation.Id, out var existingReservation))
+            {
+                reservations[reservation.Id] = existingReservation;
+
+                _logger.LogInformation($"Reservation with ID {reservation.Id} confirmed successfully.", reservation.Id);
+                return Task.FromResult<bool>(true);
+            }
+        }
+
+        _logger.LogWarning($"Reservation with ID {reservation.Id} not found for concert ID {concertId}.", reservation.Id, concertId);
         return Task.FromResult<bool>(false);
     }
 }

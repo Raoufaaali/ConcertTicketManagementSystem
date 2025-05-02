@@ -18,7 +18,7 @@ Core features:
 - Purchase tickets (Can assume there is already Payment Processing System in
 place which you can leverage)
 - Cancel reservations
-- View ticket availability
+- ~~View ticket availability~~
 
 
 ## Design Decisions

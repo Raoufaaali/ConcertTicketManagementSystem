@@ -207,4 +207,29 @@ public sealed class ConcertService : IConcertService
         _logger.LogWarning($"Failed to cancel reservation with ID {reservationId} for concert ID {concertId}.", reservationId, concertId);
         return Result<bool>.Failure(new[] { "Reservation not found" });
     }
+
+    public async Task<Result<bool>> PurchaseTicketAsync(int concertId, int reservationId, CancellationToken cancellationToken)
+    {
+        // Retrieve the reservation
+        var reservation = await _reservationRepository.GetReservationAsync(reservationId, concertId, cancellationToken).ConfigureAwait(false);
+
+        if (reservation == null)
+        {
+            return Result<bool>.Failure(new[] { "Reservation not found" });
+        }
+
+        // Update the reservation status to Confirmed
+        reservation.UpdateReservationStatue(ReservationStatus.Confirmed);
+
+        var isConfirmed = await _reservationRepository.ConfirmReservationAsync(reservation, concertId, cancellationToken).ConfigureAwait(false);
+
+        if (isConfirmed)
+        {
+            // return success
+            _logger.LogInformation("Reservation with ID {ReservationId} for concert ID {ConcertId} confirmed successfully.", reservationId, concertId);
+            return Result<bool>.Success(true);
+        }
+
+        return Result<bool>.Failure(new[] { "Reservation could not be confirmed" });
+    }
 }
