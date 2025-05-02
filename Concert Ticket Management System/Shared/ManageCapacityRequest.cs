@@ -6,5 +6,5 @@ public class ManageCapacityRequest
 {
     [Required]
     [Range(0, int.MaxValue, ErrorMessage = "Capacity must be a non-negative integer.")]
-    public int NewCapacity { get; set; }
+    public int NewAvailableCapacity { get; set; }
 }

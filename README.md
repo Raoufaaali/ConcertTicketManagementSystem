@@ -31,4 +31,5 @@ This task is fairly open-ended. As such, I have made some decisions in the imple
 - I have used ApiResponse<T> class. This serve as a standard way the API wrap responses (where applicable)
 - I have used DTO where applicable and hidden the business model.
 - I used AutoMapper for, well, mapping betwwen a ConcertDTO and a Concert
-
+- - Added some Fluent validation 
+- Implemented Ticket Reservations. Used min heap to manage time-based reservation in O(log n) time. 
