@@ -33,3 +33,7 @@ This task is fairly open-ended. As such, I have made some decisions in the imple
 - Added some Fluent validation 
 - Implemented Ticket Reservations. Used min heap to manage time-based reservation in O(log n) time.
 - This code probbaly has some bugs since I didn't get to add unit tests (I cannot do it all in 3 days)
+
+## Screenshot
+![image](https://github.com/user-attachments/assets/7d00eaa0-2c0a-4369-86bf-ec70c9c53358)
+
