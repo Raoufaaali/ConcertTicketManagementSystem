@@ -2,6 +2,7 @@
 using Concert_Ticket_Management_System.Services.ConcertServices;
 using Concert_Ticket_Management_System.Shared;
 using Concert_Ticket_Management_System.Shared.Validators;
+using System;
 using System.Collections.Concurrent;
 
 namespace Concert_Ticket_Management_System.DataAccessLayer.Repos.ReservationRepository;
@@ -92,7 +93,11 @@ public class ReservationRepository : IReservationRepository
                 var expiredReservation = minHeap.Dequeue();
                 if (_db.TryGetValue(concertId, out var reservations))
                 {
-                    reservations.TryRemove(expiredReservation.Id, out _);
+                    if (expiredReservation.ReservationStatus == ReservationStatus.Canceled ||
+                        expiredReservation.ReservationStatus == ReservationStatus.Pending)
+                    {
+                        reservations.TryRemove(expiredReservation.Id, out _);
+                    }
                 }
             }
             var x = minHeap.Count;
@@ -140,5 +145,23 @@ public class ReservationRepository : IReservationRepository
 
         _logger.LogInformation($"Reservation with ID {newId} added to the database and state tracker.");
         return reservation;
+    }
+
+    public async Task<Reservation?> GetReservationAsync(int reservationId, int concertId, CancellationToken cancellationToken)
+    {
+        // Clean up expired reservations for all concerts
+        DequeueExpiredItems(concertId);
+
+        // Look up the reservation in the database
+        if (_db.TryGetValue(concertId, out var reservations))
+        {
+            if (reservations.TryGetValue(reservationId, out var reservation))
+            {
+                return reservation; // Return the reservation if found
+            }
+        }
+
+        _logger.LogWarning($"Reservation with ID {reservationId} not found.");
+        return null;
     }
 }
