@@ -25,4 +25,6 @@ public interface IConcertService
     Task<Result<bool>> CancelReservationAsync(int concertId, int reservationId, CancellationToken cancellationToken);
 
     Task<Result<bool>> PurchaseTicketAsync(int concertId, int reservationId, CancellationToken cancellationToken);
+    
+    Task<Result<int>> GetReservationAvailabilityAsync(int concertId, CancellationToken cancellationToken);
 }

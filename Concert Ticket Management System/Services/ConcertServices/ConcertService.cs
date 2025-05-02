@@ -226,10 +226,21 @@ public sealed class ConcertService : IConcertService
         if (isConfirmed)
         {
             // return success
-            _logger.LogInformation("Reservation with ID {ReservationId} for concert ID {ConcertId} confirmed successfully.", reservationId, concertId);
             return Result<bool>.Success(true);
         }
 
         return Result<bool>.Failure(new[] { "Reservation could not be confirmed" });
+    }
+
+    public async Task<Result<int>> GetReservationAvailabilityAsync(int concertId, CancellationToken cancellationToken)
+    {
+        var concert = await _concertRepository.GetEventByIdAsync(concertId, cancellationToken).ConfigureAwait(false);
+
+        if (concert == null)
+        {
+            return Result<int>.Failure(new[] { "Concert not found." });
+        }
+        var availableCapacity = await _reservationRepository.GetTicketAvailabilityAsync(concert, cancellationToken).ConfigureAwait(false);
+        return Result<int>.Success(availableCapacity);
     }
 }

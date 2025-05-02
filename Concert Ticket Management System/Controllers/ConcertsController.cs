@@ -185,4 +185,16 @@ public class ConcertsController : Controller
 
         return Ok(new ApiResponse<string>(true, new List<string> { "Ticket purchased successfully." }));
     }
+
+    [HttpGet("{concertId:int}/view-availability")]
+    public async Task<IActionResult> GetReservationAvailabilityAsync(int concertId, CancellationToken cancellationToken)
+    {
+        var result = await _concertService.GetReservationAvailabilityAsync(concertId, cancellationToken).ConfigureAwait(false);
+
+        if (!result.IsSuccess)
+        {
+            return NotFound(new ApiResponse<string>(false, new List<string> { "Reservation not found." }));
+        }
+        return Ok(new ApiResponse<int>(true, new List<string> { "Reservation availability retrieved successfully." }, result.Data));
+    }
 }

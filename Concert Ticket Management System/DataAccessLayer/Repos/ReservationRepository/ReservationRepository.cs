@@ -197,4 +197,21 @@ public class ReservationRepository : IReservationRepository
         _logger.LogWarning($"Reservation with ID {reservation.Id} not found for concert ID {concertId}.", reservation.Id, concertId);
         return Task.FromResult<bool>(false);
     }
+
+    public Task<int> GetTicketAvailabilityAsync(Concert concert, CancellationToken cancellationToken)
+    {
+        if (concert == null)
+        {
+            throw new ArgumentNullException(nameof(concert), "Concert cannot be null.");
+        }
+
+        // Clean up expired reservations for the given concert
+        DequeueExpiredItems(concert.Id);
+        if (_db.TryGetValue(concert.Id, out var reservations))
+        {
+            return Task.FromResult<int>(concert.TotalCapacity - reservations.Count);
+        }
+        // there are no reservations for this concert, so the available capacity is the total capacity
+        return Task.FromResult<int>(concert.TotalCapacity);
+    }
 }
