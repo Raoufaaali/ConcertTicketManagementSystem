@@ -193,4 +193,18 @@ public sealed class ConcertService : IConcertService
         return DateTimeOffset.UtcNow.AddSeconds(seconds);
     }
 
+    public async Task<Result<bool>> CancelReservationAsync(int concertId, int reservationId, CancellationToken cancellationToken)
+    {
+        // Call the repository to clean up and remove the reservation
+        var isCancelledSuccessfully = await _reservationRepository.CancelReservationAsync(reservationId, concertId, cancellationToken).ConfigureAwait(false);
+
+        if (isCancelledSuccessfully)
+        {
+            _logger.LogInformation($"Reservation with ID {reservationId} for concert ID {concertId} canceled successfully.", reservationId, concertId);
+            return Result<bool>.Success(true);
+        }
+
+        _logger.LogWarning($"Failed to cancel reservation with ID {reservationId} for concert ID {concertId}.", reservationId, concertId);
+        return Result<bool>.Failure(new[] { "Reservation not found" });
+    }
 }

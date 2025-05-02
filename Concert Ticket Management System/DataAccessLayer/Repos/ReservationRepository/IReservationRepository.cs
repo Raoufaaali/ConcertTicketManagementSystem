@@ -10,4 +10,5 @@ public interface IReservationRepository
     Task<Result<Reservation>> ConfirmReservationAsync(int reservationId, CancellationToken cancellationToken);
 
     Task<Reservation?> GetReservationAsync(int reservationId, int concertId, CancellationToken cancellationToken);
+    Task<bool> CancelReservationAsync(int reservationId, int concertId, CancellationToken cancellationToken);
 }

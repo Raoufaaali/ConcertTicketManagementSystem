@@ -164,4 +164,22 @@ public class ReservationRepository : IReservationRepository
         _logger.LogWarning($"Reservation with ID {reservationId} not found.");
         return null;
     }
+
+    public Task<bool> CancelReservationAsync(int reservationId, int concertId, CancellationToken cancellationToken)
+    {
+        // Clean up expired reservations for the given concert
+        DequeueExpiredItems(concertId);
+
+        if (_db.TryGetValue(concertId, out var reservations))
+        {
+            if (reservations.TryRemove(reservationId, out _))
+            {
+                _logger.LogInformation("Reservation with ID {ReservationId} removed from the database for concert ID {ConcertId}.", reservationId, concertId);
+                return Task.FromResult<bool>(true);
+            }
+        }
+
+        _logger.LogWarning("Reservation with ID {ReservationId} not found for concert ID {ConcertId}.", reservationId, concertId);
+        return Task.FromResult<bool>(false);
+    }
 }
