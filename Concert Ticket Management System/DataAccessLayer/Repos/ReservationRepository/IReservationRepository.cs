@@ -7,8 +7,9 @@ public interface IReservationRepository
 {
     Task<Result<Reservation>> AddReservationAsync(Reservation reservation, Concert concert, CancellationToken cancellationToken);
 
-    Task<Result<Reservation>> ConfirmReservationAsync(int reservationId, CancellationToken cancellationToken);
-
     Task<Reservation?> GetReservationAsync(int reservationId, int concertId, CancellationToken cancellationToken);
+    
     Task<bool> CancelReservationAsync(int reservationId, int concertId, CancellationToken cancellationToken);
+
+    Task<bool> ConfirmReservationAsync(Reservation reservation, int concertId, CancellationToken cancellationToken);
 }

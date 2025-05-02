@@ -147,7 +147,7 @@ public class ConcertsController : Controller
         return Ok(new ApiResponse<Reservation>(true, new List<string> { "Ticket(s) reserved successfully." }, result.Data));
     }
 
-    [HttpGet("{concertId:int}/reserve-tickets/{reservationId:int}")]
+    [HttpGet("{concertId:int}/view-tickets/{reservationId:int}")]
     public async Task<IActionResult> GetReservationAsync(int reservationId,int concertId, CancellationToken cancellationToken)
     {
         var result = await _concertService.GetReservationByIdAsync(reservationId, concertId, cancellationToken).ConfigureAwait(false);
@@ -171,5 +171,18 @@ public class ConcertsController : Controller
         }
 
         return NoContent(); // 204 No Content
+    }
+
+    [HttpPut("{concertId:int}/confirm-tickets/{reservationId:int}")]
+    public async Task<IActionResult> PurchaseTicketAsync(int concertId, int reservationId, CancellationToken cancellationToken)
+    {
+        var result = await _concertService.PurchaseTicketAsync(concertId, reservationId, cancellationToken).ConfigureAwait(false);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new ApiResponse<string>(false, result.Errors));
+        }
+
+        return Ok(new ApiResponse<string>(true, new List<string> { "Ticket purchased successfully." }));
     }
 }
