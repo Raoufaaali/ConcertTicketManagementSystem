@@ -32,4 +32,5 @@ This task is fairly open-ended. As such, I have made some decisions in the imple
 - I have used DTO where applicable and hidden the business model.
 - I used AutoMapper for, well, mapping betwwen a ConcertDTO and a Concert
 - Added some Fluent validation 
-- Implemented Ticket Reservations. Used min heap to manage time-based reservation in O(log n) time. 
+- Implemented Ticket Reservations. Used min heap to manage time-based reservation in O(log n) time.
+- This code probbaly has some bugs since I didn't get to add unit tests (I cannot do it all in 3 days)
