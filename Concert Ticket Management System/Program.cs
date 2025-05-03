@@ -24,7 +24,6 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddSingleton<IConcertService, ConcertService>();
 builder.Services.AddSingleton<IConcertRepository, ConcertRepository>();
 builder.Services.AddSingleton<IReservationRepository, ReservationRepository>();
-builder.Services.AddSingleton(typeof(Lazy<>), typeof(Lazy<>));
 
 var app = builder.Build();
 
