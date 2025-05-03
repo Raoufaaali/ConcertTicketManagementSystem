@@ -89,7 +89,8 @@ public class ReservationRepository : IReservationRepository
                 if (_db.TryGetValue(concertId, out var reservations))
                 {
                     if (expiredReservation.ReservationStatus == ReservationStatus.Canceled ||
-                        expiredReservation.ReservationStatus == ReservationStatus.Pending)
+                        expiredReservation.ReservationStatus == ReservationStatus.Pending  ||
+                        expiredReservation.ReservationStatus == ReservationStatus.Unknown)
                     {
                         reservations.TryRemove(expiredReservation.Id, out _);
                     }
